@@ -6,15 +6,14 @@ Inspired by Alister Burt's
 Subboxing for ChimeraX: turn particles of a complex into particles of its
 subunits. Works with RELION and Warp/M star files.
 
-<a href="docs/morph.mp4"><img src="docs/morph-poster.jpg" width="420"></a>
+<p align="center">
+  <a href="docs/demo.mp4"><img src="docs/demo-poster.jpg" width="720"></a>
+</p>
+<p align="center"><em>Click for a 50 s walkthrough.</em></p>
 
-*Turn nice map into much nicer map by subboxing your symmetry!*
-
-![Particles in, particles out](docs/subbox-example.png)
-
-[![Watch the demo](docs/demo-poster.jpg)](docs/demo.mp4)
-
-*Click for a 50 s walkthrough.*
+<p align="center">
+  <img src="docs/subbox-example.png" width="640">
+</p>
 
 ## Install
 
@@ -40,6 +39,12 @@ Subbox finds the transform of each monomer relative to the parent map, then for
 every particle in the input star file writes one output particle per monomer.
 Offsets are measured between the intensity-weighted centres of mass of the
 maps, so keep the parent and the monomer at the same contour level.
+
+<p align="center">
+  <a href="docs/morph.mp4"><img src="docs/morph-poster.jpg" width="420"></a>
+</p>
+<p align="center"><em>Turn nice map into much nicer map by subboxing your
+symmetry!</em></p>
 
 ## Zeroing offset components
 
