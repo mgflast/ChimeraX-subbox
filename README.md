@@ -33,14 +33,37 @@ implemented with numpy only, so it runs in a stock ChimeraX.
 
 ## Install
 
-Clone the repository, then from the ChimeraX command line:
+**From a release (recommended).** Download the `.whl` from the
+[latest release](https://github.com/mgflast/ChimeraX-subbox/releases/latest),
+then in ChimeraX:
+
+```
+toolshed install /path/to/ChimeraX_Subbox-1.1-py3-none-any.whl
+```
+
+The wheel is pure Python and platform independent — the same file works on
+Linux, macOS and Windows. Restart ChimeraX (or run `toolshed reload installed`)
+and the tool appears under `Tools ▸ Volume Data ▸ Subbox Particles`.
+
+**From source.** Clone the repository and, from the ChimeraX command line:
 
 ```
 devel install "/path/to/ChimeraX-Subbox"
 ```
 
-(That builds and installs it in place. Use `devel clean <path>` to remove build
-artifacts.) After installing, restart or run `toolshed reload installed`.
+That builds and installs it in place; `devel clean <path>` removes the build
+artifacts afterwards.
+
+**Uninstall:** `toolshed uninstall ChimeraX-Subbox`
+
+### Building a wheel yourself
+
+```
+chimerax --nogui --exit --cmd "devel build /path/to/ChimeraX-Subbox exit true"
+```
+
+The wheel lands in `dist/`. Bump `version` in `bundle_info.xml` before
+building a new release.
 
 ## Use — GUI
 
