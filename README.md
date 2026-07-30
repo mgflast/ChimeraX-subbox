@@ -1,7 +1,14 @@
 # ChimeraX-Subbox
 
+Inspired by Alister Burt's
+[napari-subboxer](https://github.com/alisterburt/napari-subboxer).
+
 Subboxing for ChimeraX: turn particles of a complex into particles of its
 subunits. Works with RELION and Warp/M star files.
+
+<a href="docs/morph.mp4"><img src="docs/morph-poster.jpg" width="420"></a>
+
+*Turn nice map into much nicer map by subboxing your symmetry!*
 
 [![Watch the demo](docs/demo-poster.jpg)](docs/demo.mp4)
 
