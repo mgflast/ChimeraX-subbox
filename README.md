@@ -17,7 +17,7 @@ microtubule</strong></p>
 </p>
 
 <p align="center">
-  <a href="docs/morph.mp4"><img src="docs/morph-poster.jpg" width="50%"></a>
+  <a href="docs/morph.mp4"><img src="docs/morph.webp" width="50%"></a>
 </p>
 <p align="center"><em>Turn nice map into much nicer map by subboxing your
 symmetry!</em></p>
@@ -59,6 +59,4 @@ subunit. For a microtubule with the filament axis along Z:
 * **don't zero them** — the particles are now centred on a protofilament.
   Depending on what you feed them into next, you may need to make a new mask.
 
-by Mart So-Last (mgflast@gmail.com)
-
-MIT licensed.
+© Mart So-Lat, 2026 (mgflast@gmail.com)
