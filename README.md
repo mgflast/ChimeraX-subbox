@@ -1,5 +1,3 @@
-# ChimeraX-Subbox
-
 Inspired by Alister Burt's
 [napari-subboxer](https://github.com/alisterburt/napari-subboxer).
 
