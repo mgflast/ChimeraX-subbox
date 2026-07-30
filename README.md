@@ -3,7 +3,9 @@
 Subboxing for ChimeraX: turn particles of a complex into particles of its
 subunits. Works with RELION and Warp/M star files.
 
-*Video tutorial coming soon.*
+[![Watch the demo](docs/demo-poster.jpg)](docs/demo.mp4)
+
+*Click for a 50 s walkthrough.*
 
 ## Install
 
