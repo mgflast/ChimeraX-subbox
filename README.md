@@ -27,11 +27,23 @@ Then open it via `Tools ▸ Volume Data ▸ Subbox Particles`.
 
 Subbox finds the transform of each monomer relative to the parent map, then for
 every particle in the input star file writes one output particle per monomer.
-
-Optionally it deduplicates: set a distance threshold D, and of any pair of
-particles within D of each other, one is removed. Per tomogram.
-
 Offsets are measured between the intensity-weighted centres of mass of the
 maps, so keep the parent and the monomer at the same contour level.
+
+## Zeroing offset components
+
+Each monomer's offset from the parent can be zeroed per axis, which decides
+whether the output particles stay centred on the complex or move onto the
+subunit. For a microtubule with the filament axis along Z:
+
+* **zero X and Y** — the particles are still microtubule segments, just shifted
+  along Z and rotated about the tube axis.
+* **don't zero them** — the particles are now centred on a protofilament.
+  Depending on what you feed them into next, you may need to make a new mask.
+
+## Deduplication
+
+Optional: set a distance threshold D, and of any pair of particles within D of
+each other, one is removed. Per tomogram.
 
 MIT licensed.
