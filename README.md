@@ -9,7 +9,7 @@ transformations to a particle starfile. Inspired by Alister Burt's
 microtubule</strong></p>
 
 <p align="center">
-  <a href="docs/demo.mp4"><img src="docs/demo-poster.jpg" width="100%"></a>
+  <a href="docs/demo.mp4"><img src="docs/demo.webp" width="100%"></a>
 </p>
 
 <p align="center">
