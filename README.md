@@ -1,7 +1,12 @@
+<h3 align="center">ChimeraX subboxing plugin</h3>
+
 Subboxing for ChimeraX. Open a cryoEM map with a complex symmetry, crop a
 monomer, and place the monomers in the parent map. Apply the corresponding
 transformations to a particle starfile. Inspired by Alister Burt's
 [napari-subboxer](https://github.com/alisterburt/napari-subboxer).
+
+<p align="center"><strong>Demonstration: subboxing a 13-protofilament
+microtubule</strong></p>
 
 <p align="center">
   <a href="docs/demo.mp4"><img src="docs/demo-poster.jpg" width="100%"></a>
@@ -54,9 +59,6 @@ subunit. For a microtubule with the filament axis along Z:
 * **don't zero them** — the particles are now centred on a protofilament.
   Depending on what you feed them into next, you may need to make a new mask.
 
-## Deduplication
-
-Optional: set a distance threshold D, and of any pair of particles within D of
-each other, one is removed. Per tomogram.
+by Mart So-Last (mgflast@gmail.com)
 
 MIT licensed.
