@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<BundleInfo name="ChimeraX-Subbox" version="1.1"
+            package="chimerax.subbox"
+            purePython="true"
+            minSessionVersion="1" maxSessionVersion="1">
+
+  <Author>Mart Last</Author>
+  <Email>mgflast@gmail.com</Email>
+  <URL>https://github.com/mgflast/ChimeraX-Subbox</URL>
+
+  <Synopsis>Subbox particle STAR files from placed monomer maps</Synopsis>
+  <Description>
+Expand a subtomogram-averaging particle STAR file into sub-particles.
+
+Place one or more copies of a monomer/reference map onto a parent complex map
+in the ChimeraX scene (e.g. one alpha/beta-tubulin monomer on each protofilament
+of a microtubule segment).  Subbox reads each child map's orientation and
+centre-of-mass offset relative to the parent, then rewrites every particle in
+the STAR file into one sub-particle per child, with the corresponding rotation
+and translation applied.  Works with RELION (rln*) and Warp (wrp*) column
+conventions.
+  </Description>
+
+  <Categories>
+    <Category name="Volume Data"/>
+  </Categories>
+
+  <Dependencies>
+    <Dependency name="ChimeraX-Core" version="~=1.0"/>
+    <Dependency name="ChimeraX-Map"/>
+    <Dependency name="ChimeraX-UI"/>
+  </Dependencies>
+
+  <Classifiers>
+    <PythonClassifier>Development Status :: 4 - Beta</PythonClassifier>
+    <PythonClassifier>License :: OSI Approved :: MIT License</PythonClassifier>
+    <ChimeraXClassifier>ChimeraX :: Command :: subbox :: Volume Data :: Expand a particle STAR file into sub-particles per child map</ChimeraXClassifier>
+    <ChimeraXClassifier>ChimeraX :: Tool :: Subbox Particles :: Volume Data :: Generate subboxed particle STAR files</ChimeraXClassifier>
+  </Classifiers>
+
+</BundleInfo>

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# ChimeraX / setuptools build output ("devel build" / "devel install")
+build/
+dist/
+setup.py
+setup.cfg
+MANIFEST.in
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
