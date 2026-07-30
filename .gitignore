@@ -11,8 +11,9 @@ setup.py
 setup.cfg
 MANIFEST.in
 
-# Raw screen recordings dropped in the bundle root (docs/demo.mp4 is tracked)
+# Raw assets dropped in the bundle root (the copies under docs/ are tracked)
 /*.mp4
+/*.png
 
 # Editors / OS
 .idea/

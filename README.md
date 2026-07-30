@@ -10,6 +10,8 @@ subunits. Works with RELION and Warp/M star files.
 
 *Turn nice map into much nicer map by subboxing your symmetry!*
 
+![Particles in, particles out](docs/subbox-example.png)
+
 [![Watch the demo](docs/demo-poster.jpg)](docs/demo.mp4)
 
 *Click for a 50 s walkthrough.*
