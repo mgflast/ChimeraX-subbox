@@ -59,4 +59,4 @@ subunit. For a microtubule with the filament axis along Z:
 * **don't zero them** — the particles are now centred on a protofilament.
   Depending on what you feed them into next, you may need to make a new mask.
 
-© Mart So-Lat, 2026 (mgflast@gmail.com)
+© Mart So-Last, 2026 (mgflast@gmail.com)
