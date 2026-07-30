@@ -103,13 +103,13 @@ class SubboxTool(ToolInstance):
         row += 1
 
         # Deduplication
-        grid.addWidget(QLabel("Min. particle distance:"), row, 0)
+        grid.addWidget(QLabel("Min. particle distance (Å):"), row, 0)
         self.dedup_edit = QLineEdit("0")
         self.dedup_edit.setToolTip(
-            "Deduplication threshold, in the same units as the star's "
-            "coordinates (divide an Ångström distance by the coordinate pixel "
-            "size above). Within each tomogram, a sub-particle closer than "
-            "this to a sub-particle that was already kept is discarded. "
+            "Deduplication threshold in Ångström. Within each tomogram, a "
+            "sub-particle closer than this to a sub-particle that was already "
+            "kept is discarded. Converted to coordinate units with the "
+            "coordinate pixel size above, like the child offsets. "
             "0 disables deduplication.")
         grid.addWidget(self.dedup_edit, row, 1)
         self.tomo_edit = QLineEdit()

@@ -1,4 +1,9 @@
-"""The ``subbox`` command."""
+"""The ``subbox`` command.
+
+``minDistance`` is in Angstrom (0 = off) and is converted to coordinate units
+with ``pixelSize``, like the child offsets.  ``tomoLabel`` overrides which
+column identifies the tomogram for deduplication.
+"""
 
 from chimerax.core.commands import (
     CmdDesc, register, OpenFileNameArg, SaveFileNameArg,

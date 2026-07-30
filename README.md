@@ -53,8 +53,8 @@ artifacts.) After installing, restart or run `toolshed reload installed`.
 * **Zero offset component** — X/Y/Z checkboxes drop that component of each
   child's offset. For a microtubule with the reference centred on the tube
   axis, zero X and Y and keep Z (the helical rise); this is the default.
-* **Min. particle distance** — deduplication threshold in coordinate units
-  (0 = off), with an optional tomogram-column override next to it. See
+* **Min. particle distance (Å)** — deduplication threshold (0 = off), with an
+  optional tomogram-column override next to it. See
   [Deduplication](#deduplication).
 * **Preview transforms** logs the parsed offset + angles per child without
   writing anything. **Generate subbox STAR** does the run.
@@ -77,7 +77,7 @@ subbox  "in.star"  output "out.star"  parent #1  children #2-14 \
 | `pixelSize`     | Å/px of the star coordinates (see Units below)       | 1.0       |
 | `addParentId`   | add a `parentID` column                              | true      |
 | `parentIdLabel` | name of that column                                  | `parentID`|
-| `minDistance`   | deduplication threshold, coordinate units (0 = off)  | 0         |
+| `minDistance`   | deduplication threshold in Å (0 = off)               | 0         |
 | `tomoLabel`     | column identifying the tomogram                      | auto      |
 
 ## Deduplication
@@ -90,13 +90,17 @@ if a sub-particle that was already kept **from the same tomogram** lies within
 there is no attempt to choose which of a clashing pair to delete so as to
 maximise the final particle count.
 
-* The threshold is in the **units of the coordinate columns**, i.e. the same
-  units as `rlnCoordinateX`. For a threshold in Ångström, divide it by the
-  coordinate pixel size.
-* Tomograms are identified by the first of `rlnTomoName`, `rlnMicrographName`,
-  `wrpSourceName`, `wrpSourceHash` present in the file. Set `tomoLabel` to pick
-  another column. If none is found, the whole file is treated as one tomogram
-  and a warning is logged.
+* The threshold is in **Ångström**. It is divided by `pixelSize` to reach the
+  units of the coordinate columns, exactly like the child offsets — so if your
+  coordinates are in tomogram pixels, set `pixelSize` correctly (see
+  [Units](#units--pixel-size)) or the threshold will be off by that factor.
+* Deduplication is done **per tomogram**, so two particles at the same X/Y/Z in
+  different tomograms are both kept. The tomogram is read from the first of
+  `rlnTomoName`, `rlnMicrographName`, `wrpSourceName`, `wrpSourceHash` present
+  in the file — `tomoLabel` overrides that choice if your file identifies
+  tomograms by some other column (a custom label, or `rlnImageName` in a file
+  that has no micrograph column). If no column is found and none was given, the
+  whole file is treated as a single tomogram and a warning is logged.
 * The log reports how many sub-particles were removed.
 
 ## Units / pixel size

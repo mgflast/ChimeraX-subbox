@@ -448,19 +448,24 @@ def run_subbox(session, star_in, star_out, parent, children,
     match; use the star's pixel size when the coordinates are in tomogram
     pixels but the map is displayed in Angstrom.
 
-    `min_distance` (in coordinate units, 0 = off) removes duplicate
-    sub-particles: within each tomogram, a particle closer than this to an
-    already-kept particle is discarded.  `tomo_label` names the column that
-    identifies the tomogram; by default the first recognised one is used.
+    `min_distance` (Angstrom, 0 = off) removes duplicate sub-particles: within
+    each tomogram, a particle closer than this to an already-kept particle is
+    discarded.  It is divided by `coord_pixel_size` to get the threshold in
+    coordinate units, exactly like the child offsets.  `tomo_label` names the
+    column that identifies the tomogram; by default the first recognised one is
+    used.
     """
     from chimerax.core.errors import UserError
 
     if not children:
         raise UserError("No child maps selected.")
+    if float(coord_pixel_size) <= 0.0:
+        raise UserError("coordPixelSize must be positive, got {}".format(
+            coord_pixel_size))
 
     transforms, details = compute_transforms(parent, children, force)
 
-    if coord_pixel_size and coord_pixel_size != 1.0:
+    if coord_pixel_size != 1.0:
         transforms = [(rel_pos / float(coord_pixel_size), child_rot)
                       for rel_pos, child_rot in transforms]
 
@@ -513,6 +518,11 @@ def run_subbox(session, star_in, star_out, parent, children,
     n_expanded = len(new_rows)
     dedup_note = ""
     if min_distance and float(min_distance) > 0.0:
+        # The threshold is given in Angstrom; the coordinates are in star
+        # units, so convert with the same pixel size used for the offsets.
+        px = float(coord_pixel_size)
+        threshold = float(min_distance) / px
+
         tomo_col = find_tomo_column(labels, tomo_label)
         if tomo_label and tomo_col is None:
             raise UserError(
@@ -526,11 +536,12 @@ def run_subbox(session, star_in, star_out, parent, children,
             tomo_idx = None
         else:
             tomo_idx = labels.index(tomo_col)
-            log.info("Subbox: deduplicating per '{}' at {} coordinate "
-                     "units".format(tomo_col, min_distance))
+        log.info("Subbox: deduplicating per '{}' at {} A = {:.4g} coordinate "
+                 "units ({} A/px)".format(
+                     tomo_col or '(whole file)', min_distance, threshold, px))
         new_rows, n_removed = deduplicate_rows(
-            new_rows, (cx, cy, cz), min_distance, tomo_idx)
-        dedup_note = (", {} removed by {}-unit deduplication".format(
+            new_rows, (cx, cy, cz), threshold, tomo_idx)
+        dedup_note = (", {} removed by {} A deduplication".format(
             n_removed, min_distance))
 
     pblock.rows = new_rows
