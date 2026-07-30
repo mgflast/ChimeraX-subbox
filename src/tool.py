@@ -112,12 +112,6 @@ class SubboxTool(ToolInstance):
             "coordinate pixel size above, like the child offsets. "
             "0 disables deduplication.")
         grid.addWidget(self.dedup_edit, row, 1)
-        self.tomo_edit = QLineEdit()
-        self.tomo_edit.setPlaceholderText("tomogram column (auto)")
-        self.tomo_edit.setToolTip(
-            "Column that identifies the tomogram, e.g. rlnTomoName, "
-            "rlnMicrographName or wrpSourceName. Leave empty to auto-detect.")
-        grid.addWidget(self.tomo_edit, row, 2)
         row += 1
 
         # Force-zero options
@@ -183,9 +177,6 @@ class SubboxTool(ToolInstance):
             fz=str(self.fz.isChecked()).lower(),
             px=px, dd=dedup,
         )
-        tomo = self.tomo_edit.text().strip()
-        if tomo:
-            cmd += ' tomoLabel "{}"'.format(tomo)
         return cmd
 
     def _fill_pixel_size_from_map(self):

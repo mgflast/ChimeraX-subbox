@@ -53,9 +53,9 @@ artifacts.) After installing, restart or run `toolshed reload installed`.
 * **Zero offset component** — X/Y/Z checkboxes drop that component of each
   child's offset. For a microtubule with the reference centred on the tube
   axis, zero X and Y and keep Z (the helical rise); this is the default.
-* **Min. particle distance (Å)** — deduplication threshold (0 = off), with an
-  optional tomogram-column override next to it. See
-  [Deduplication](#deduplication).
+* **Min. particle distance (Å)** — deduplication threshold (0 = off). The
+  tomogram column is auto-detected; use the `subbox` command's `tomoLabel` if
+  you need to name it yourself. See [Deduplication](#deduplication).
 * **Preview transforms** logs the parsed offset + angles per child without
   writing anything. **Generate subbox STAR** does the run.
 
