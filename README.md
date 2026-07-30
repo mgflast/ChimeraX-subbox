@@ -1,8 +1,7 @@
-Inspired by Alister Burt's
+Subboxing for ChimeraX. Open a cryoEM map with a complex symmetry, crop a
+monomer, and place the monomers in the parent map. Apply the corresponding
+transformations to a particle starfile. Inspired by Alister Burt's
 [napari-subboxer](https://github.com/alisterburt/napari-subboxer).
-
-Subboxing for ChimeraX: turn particles of a complex into particles of its
-subunits. Works with RELION and Warp/M star files.
 
 <p align="center">
   <a href="docs/demo.mp4"><img src="docs/demo-poster.jpg" width="100%"></a>
@@ -40,6 +39,7 @@ Then open it via `Tools ▸ Volume Data ▸ Subbox Particles`.
 
 Subbox finds the transform of each monomer relative to the parent map, then for
 every particle in the input star file writes one output particle per monomer.
+RELION and Warp/M star files both work.
 Offsets are measured between the intensity-weighted centres of mass of the
 maps, so keep the parent and the monomer at the same contour level.
 
