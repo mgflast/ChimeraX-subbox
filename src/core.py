@@ -375,7 +375,7 @@ def find_particle_block(blocks):
 # Deduplication
 # ---------------------------------------------------------------------------
 
-def deduplicate_rows(rows, coord_idx, min_distance, tomo_idx=None):
+def deduplicate_rows(rows, coord_idx, min_distance, tomo_idx):
     """Greedily drop particles that sit too close to an already-kept particle.
 
     Rows are visited in order; a row is kept unless a previously kept row from
@@ -388,8 +388,9 @@ def deduplicate_rows(rows, coord_idx, min_distance, tomo_idx=None):
     rows : list of list-of-str      particle rows
     coord_idx : (ix, iy, iz)        column indices of the coordinates
     min_distance : float            threshold; <= 0 disables and returns as-is
-    tomo_idx : int or None          column index grouping rows per tomogram;
-                                    None treats the whole file as one group
+    tomo_idx : int                  column index grouping rows per tomogram;
+                                    required -- particles are only ever
+                                    compared within one tomogram
 
     Returns
     -------
@@ -410,8 +411,7 @@ def deduplicate_rows(rows, coord_idx, min_distance, tomo_idx=None):
 
     for row in rows:
         x = float(row[ix]); y = float(row[iy]); z = float(row[iz])
-        key = row[tomo_idx] if tomo_idx is not None else ''
-        grid = grids.setdefault(key, {})
+        grid = grids.setdefault(row[tomo_idx], {})
         ci = int(np.floor(x / d)); cj = int(np.floor(y / d)); ck = int(np.floor(z / d))
 
         clash = False
@@ -529,20 +529,23 @@ def run_subbox(session, star_in, star_out, parent, children,
                 "Requested tomogram column '{}' is not in the star file. "
                 "Available columns: {}".format(tomo_label, ", ".join(labels)))
         if tomo_col is None:
+            # Deduplication is only ever meaningful within one tomogram, so
+            # without a tomogram column we skip it rather than compare
+            # coordinates from different tomograms.
             log.warning(
-                "Subbox: no tomogram column found ({}); deduplicating across "
-                "the whole file as if it were one tomogram.".format(
+                "Subbox: could not deduplicate because the star file has no "
+                "tomogram label (options: {}). Use tomoLabel to name the "
+                "column that identifies the tomogram.".format(
                     ", ".join(_TOMO_LABELS)))
-            tomo_idx = None
+            dedup_note = ", deduplication skipped (no tomogram label)"
         else:
-            tomo_idx = labels.index(tomo_col)
-        log.info("Subbox: deduplicating per '{}' at {} A = {:.4g} coordinate "
-                 "units ({} A/px)".format(
-                     tomo_col or '(whole file)', min_distance, threshold, px))
-        new_rows, n_removed = deduplicate_rows(
-            new_rows, (cx, cy, cz), threshold, tomo_idx)
-        dedup_note = (", {} removed by {} A deduplication".format(
-            n_removed, min_distance))
+            log.info("Subbox: deduplicating per '{}' at {} A = {:.4g} "
+                     "coordinate units ({} A/px)".format(
+                         tomo_col, min_distance, threshold, px))
+            new_rows, n_removed = deduplicate_rows(
+                new_rows, (cx, cy, cz), threshold, labels.index(tomo_col))
+            dedup_note = ", {} removed by {} A deduplication".format(
+                n_removed, min_distance)
 
     pblock.rows = new_rows
 

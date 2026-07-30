@@ -94,13 +94,17 @@ maximise the final particle count.
   units of the coordinate columns, exactly like the child offsets — so if your
   coordinates are in tomogram pixels, set `pixelSize` correctly (see
   [Units](#units--pixel-size)) or the threshold will be off by that factor.
-* Deduplication is done **per tomogram**, so two particles at the same X/Y/Z in
-  different tomograms are both kept. The tomogram is read from the first of
-  `rlnTomoName`, `rlnMicrographName`, `wrpSourceName`, `wrpSourceHash` present
-  in the file — `tomoLabel` overrides that choice if your file identifies
-  tomograms by some other column (a custom label, or `rlnImageName` in a file
-  that has no micrograph column). If no column is found and none was given, the
-  whole file is treated as a single tomogram and a warning is logged.
+* Deduplication is always done **per tomogram**, so two particles at the same
+  X/Y/Z in different tomograms are both kept. The tomogram is read from the
+  first of `rlnTomoName`, `rlnMicrographName`, `wrpSourceName`, `wrpSourceHash`
+  present in the file — `tomoLabel` overrides that choice if your file
+  identifies tomograms by some other column.
+* If none of those columns is present and no `tomoLabel` was given, particles
+  are **not** deduplicated across the whole file. The run continues, the
+  sub-particles are written as usual, and the log says:
+  `could not deduplicate because the star file has no tomogram label
+  (options: …)`. A `tomoLabel` naming a column that is not in the file is an
+  error and nothing is written.
 * The log reports how many sub-particles were removed.
 
 ## Units / pixel size
