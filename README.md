@@ -5,18 +5,23 @@ Subboxing for ChimeraX: turn particles of a complex into particles of its
 subunits. Works with RELION and Warp/M star files.
 
 <p align="center">
-  <a href="docs/demo.mp4"><img src="docs/demo-poster.jpg" width="720"></a>
+  <a href="docs/demo.mp4"><img src="docs/demo-poster.jpg" width="100%"></a>
 </p>
-<p align="center"><em>Click for a 50 s walkthrough.</em></p>
 
 <p align="center">
-  <img src="docs/subbox-example.png" width="640">
+  <img src="docs/subbox-example.png" width="50%">
 </p>
+
+<p align="center">
+  <a href="docs/morph.mp4"><img src="docs/morph-poster.jpg" width="50%"></a>
+</p>
+<p align="center"><em>Turn nice map into much nicer map by subboxing your
+symmetry!</em></p>
 
 ## Install
 
-Download the `.whl` from the
-[latest release](https://github.com/mgflast/ChimeraX-subbox/releases/latest)
+Download
+[ChimeraX_Subbox-1.1-py3-none-any.whl](https://github.com/mgflast/ChimeraX-subbox/raw/main/dist/ChimeraX_Subbox-1.1-py3-none-any.whl)
 and, in ChimeraX:
 
 ```
@@ -37,12 +42,6 @@ Subbox finds the transform of each monomer relative to the parent map, then for
 every particle in the input star file writes one output particle per monomer.
 Offsets are measured between the intensity-weighted centres of mass of the
 maps, so keep the parent and the monomer at the same contour level.
-
-<p align="center">
-  <a href="docs/morph.mp4"><img src="docs/morph-poster.jpg" width="420"></a>
-</p>
-<p align="center"><em>Turn nice map into much nicer map by subboxing your
-symmetry!</em></p>
 
 ## Zeroing offset components
 

@@ -6,7 +6,8 @@ __pycache__/
 
 # ChimeraX / setuptools build output ("devel build" / "devel install")
 build/
-dist/
+dist/*
+!dist/ChimeraX_Subbox-*.whl
 setup.py
 setup.cfg
 MANIFEST.in
