@@ -220,13 +220,25 @@ class SubboxTool(ToolInstance):
         force = (self.fx.isChecked(), self.fy.isChecked(), self.fz.isChecked())
         _, details = core.compute_transforms(parent, child_vols, force)
         lines = ["Preview of {} child transform(s):".format(len(details))]
-        for cid, rel_pos, euler in details:
+        warned = 0
+        for cid, rel_pos, euler, dropped in details:
+            kept = sum(c * c for c in rel_pos) ** 0.5
+            note = ""
+            if dropped > max(kept, 1.0):
+                note = "  [zeroing removed {:.1f} A!]".format(dropped)
+                warned += 1
             lines.append(
                 "  #{}: offset=({:.2f}, {:.2f}, {:.2f})  "
-                "rot/tilt/psi=({:.2f}, {:.2f}, {:.2f})".format(
+                "rot/tilt/psi=({:.2f}, {:.2f}, {:.2f}){}".format(
                     cid, rel_pos[0], rel_pos[1], rel_pos[2],
-                    euler[0], euler[1], euler[2]))
+                    euler[0], euler[1], euler[2], note))
         self.session.logger.info("\n".join(lines))
+        if warned:
+            self.session.logger.warning(
+                "Subbox: force-zeroing removed most of the offset for {} "
+                "child(ren). That is intended for filament/lattice cases like "
+                "a microtubule; if the sub-particles should sit on their "
+                "subunits, uncheck the zeroed axes.".format(warned))
 
         # Draw dots + XYZ axes as a BILD model, replacing any previous preview.
         try:

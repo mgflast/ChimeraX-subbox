@@ -25,11 +25,11 @@ symmetry!</em></p>
 ## Install
 
 Download
-[ChimeraX_Subbox-1.1-py3-none-any.whl](https://github.com/mgflast/ChimeraX-subbox/raw/main/dist/ChimeraX_Subbox-1.1-py3-none-any.whl)
+[ChimeraX_Subbox-1.3-py3-none-any.whl](https://github.com/mgflast/ChimeraX-subbox/raw/main/dist/ChimeraX_Subbox-1.3-py3-none-any.whl)
 and, in ChimeraX:
 
 ```
-toolshed install /path/to/ChimeraX_Subbox-1.1-py3-none-any.whl
+toolshed install /path/to/ChimeraX_Subbox-1.3-py3-none-any.whl
 ```
 
 Then open it via `Tools ▸ Volume Data ▸ Subbox Particles`.
@@ -45,8 +45,10 @@ Then open it via `Tools ▸ Volume Data ▸ Subbox Particles`.
 Subbox finds the transform of each monomer relative to the parent map, then for
 every particle in the input star file writes one output particle per monomer.
 RELION and Warp/M star files both work.
-Offsets are measured between the intensity-weighted centres of mass of the
-maps, so keep the parent and the monomer at the same contour level.
+Each offset runs from the parent's box centre (the point the star coordinates
+refer to) to the monomer's box centre — purely geometric, contour levels play
+no part. The monomer's box centre is where the sub-particle is centred, so
+centre the monomer in its box when you crop it.
 
 ## Zeroing offset components
 

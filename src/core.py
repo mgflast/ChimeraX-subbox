@@ -47,8 +47,13 @@ def matrix_to_euler_zyz(m):
         rot = np.arctan2(m[1, 2], m[0, 2])
         psi = np.arctan2(m[2, 1], -m[2, 0])
     else:
-        # Gimbal lock (tilt == 0 or 180): fold rot+psi into rot.
-        rot = np.arctan2(m[1, 0], m[0, 0])
+        # Gimbal lock: only rot+psi (tilt 0) or rot-psi (tilt 180) is
+        # determined; fold it into rot.  At tilt 180 the diagonal 2x2 block is
+        # [[-c, -s], [-s, c]] for angle rot-psi, hence the sign flips.
+        if m[2, 2] > 0.0:
+            rot = np.arctan2(m[1, 0], m[0, 0])
+        else:
+            rot = np.arctan2(-m[1, 0], -m[0, 0])
         psi = 0.0
     return np.degrees([rot, tilt, psi])
 
@@ -110,47 +115,37 @@ def child_volumes(models, parent):
     return vols
 
 
-def measure_center(volume):
-    """Intensity-weighted centre of mass of a Volume, in scene coordinates.
+def reference_center(volume):
+    """The box centre of a Volume (voxel N//2 per axis, the FFT centre that
+    RELION / Warp coordinates refer to), in scene coordinates.
 
-    Reproduces ChimeraX's ``measure center``: grid points at or above the
-    lowest displayed contour level are weighted by their value.  Falls back to
-    the mean level if the map has no surface.
+    Both ends of every offset are box centres: the parent's, because that is
+    the point the star coordinates mark, and the child's, because that is
+    where the sub-particle box will be centred when the child map is used as
+    the reference.  Purely geometric -- density and contour levels play no
+    part.
     """
-    m = volume.full_matrix()
-    try:
-        levels = [s.level for s in volume.surfaces]
-    except Exception:
-        levels = []
-    level = min(levels) if levels else float(m.mean())
-
-    mask = m >= level
-    if not mask.any():
-        mask = np.ones_like(m, dtype=bool)
-
-    idx = np.argwhere(mask)                 # rows are (k, j, i) == (z, y, x)
-    w = m[mask].astype(np.float64)
-    w = np.clip(w, 0.0, None)
-    if w.sum() <= 0:
-        w = np.ones_like(w)
-    mean_kji = (idx * w[:, None]).sum(axis=0) / w.sum()
-    ijk = mean_kji[::-1]                     # -> (i, j, k) == (x, y, z)
-
+    ijk = np.array([n // 2 for n in volume.data.size], float)
     xyz_data = volume.data.ijk_to_xyz(ijk)
-    scene = volume.scene_position.transform_points(np.array([xyz_data], float))[0]
-    return scene
+    return volume.scene_position.transform_points(np.array([xyz_data], float))[0]
 
 
 def compute_transforms(parent, children, force=(True, True, False)):
     """Derive (rel_pos, child_rot) for each child relative to the parent.
 
-    Rotation comes from the model's ``scene_position``; translation comes from
-    the centre-of-mass difference, expressed in the parent's local frame.  The
-    ``force`` triple zeroes the X / Y / Z components of the offset.
+    Rotation comes from the model's ``scene_position``; translation runs from
+    the parent's box centre (the point the star coordinates refer to) to the
+    child's box centre (where the sub-particle box will be centred), expressed
+    in the parent's local frame.  The ``force`` triple zeroes the X / Y / Z
+    components of the offset.
+
+    Returns (transforms, details); each detail is (id_string, rel_pos,
+    euler_of_child_rot, dropped) with ``dropped`` the Ångström magnitude the
+    force-zeroing removed from that child's offset.
     """
     p_place = parent.scene_position
     p_rot = np.asarray(p_place.matrix, float)[:, :3]      # 3x3
-    p_center = measure_center(parent)
+    p_center = reference_center(parent)
     fx, fy, fz = force
 
     transforms = []
@@ -160,19 +155,21 @@ def compute_transforms(parent, children, force=(True, True, False)):
         rel_place = p_place.inverse() * c_place
         child_rot = np.asarray(rel_place.matrix, float)[:, :3]
 
-        c_center = measure_center(child)
+        c_center = reference_center(child)
         offset_scene = np.asarray(c_center, float) - np.asarray(p_center, float)
         rel_pos = p_rot.T @ offset_scene                  # into parent frame
+        raw = rel_pos.copy()
         if fx:
             rel_pos[0] = 0.0
         if fy:
             rel_pos[1] = 0.0
         if fz:
             rel_pos[2] = 0.0
+        dropped = float(np.linalg.norm(raw - rel_pos))
 
         transforms.append((rel_pos, child_rot))
         details.append((child.id_string, rel_pos.copy(),
-                        matrix_to_euler_zyz(child_rot)))
+                        matrix_to_euler_zyz(child_rot), dropped))
     return transforms, details
 
 
@@ -185,7 +182,7 @@ def make_preview_bild(parent, children, force=(True, True, False)):
     """
     p_place = parent.scene_position
     p_rot = np.asarray(p_place.matrix, float)[:, :3]
-    p_center = measure_center(parent)
+    p_center = reference_center(parent)
     transforms, _ = compute_transforms(parent, children, force)
 
     pts, rots = [], []
@@ -473,11 +470,19 @@ def run_subbox(session, star_in, star_out, parent, children,
     log.info("Subbox: parent #{}, {} child map(s), force(X,Y,Z)={}, "
              "coordPixelSize={} A/px".format(
                  parent.id_string, len(children), force, coord_pixel_size))
-    for cid, rel_pos, euler in details:
+    for cid, rel_pos, euler, dropped in details:
         log.info("  child #{}: offset=({:.2f}, {:.2f}, {:.2f})  "
                  "rot/tilt/psi=({:.2f}, {:.2f}, {:.2f})".format(
                      cid, rel_pos[0], rel_pos[1], rel_pos[2],
                      euler[0], euler[1], euler[2]))
+        kept = float(np.linalg.norm(rel_pos))
+        if dropped > max(kept, 1.0):
+            log.warning(
+                "Subbox: force-zeroing removed {:.1f} A of child #{}'s offset "
+                "({:.1f} A kept). That is intended for filament/lattice cases "
+                "like a microtubule; if this sub-particle should sit on its "
+                "subunit, disable forceX/forceY/forceZ.".format(
+                    dropped, cid, kept))
 
     blocks = read_star(star_in)
     pblock, coord_cols, angle_cols = find_particle_block(blocks)

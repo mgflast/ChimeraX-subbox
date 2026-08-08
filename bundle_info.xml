@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<BundleInfo name="ChimeraX-Subbox" version="1.1"
+<BundleInfo name="ChimeraX-Subbox" version="1.3"
             package="chimerax.subbox"
             purePython="true"
             minSessionVersion="1" maxSessionVersion="1">
@@ -15,7 +15,7 @@ Expand a subtomogram-averaging particle STAR file into sub-particles.
 Place one or more copies of a monomer/reference map onto a parent complex map
 in the ChimeraX scene (e.g. one alpha/beta-tubulin monomer on each protofilament
 of a microtubule segment).  Subbox reads each child map's orientation and
-centre-of-mass offset relative to the parent, then rewrites every particle in
+box-centre offset relative to the parent, then rewrites every particle in
 the STAR file into one sub-particle per child, with the corresponding rotation
 and translation applied.  Works with RELION (rln*) and Warp (wrp*) column
 conventions.
