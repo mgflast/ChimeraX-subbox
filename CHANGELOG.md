@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.4
+
+* **The force-zeroing now checks the parent map's orientation.** Child maps
+  arranged around a filament or a ring share one rotation axis; the bundle now
+  measures it and warns, in the log and from the preview, when it is more than
+  5 degrees away from the axis the zeroing keeps. Caught on a Dam1 ring whose
+  axis sits 34 degrees off the parent box's Z: zeroing X and Y kept the 90 A
+  Z component and threw away 54 A that was almost entirely *along* the ring
+  axis, displacing every sub-particle sideways. The 1.2 warning did not fire,
+  because it only triggers when the zeroing removes more than it keeps.
+* **Fixed: preview arrows are scaled from the child map's box** rather than
+  from the spread of the child positions. Rotational copies of one subunit can
+  sit within a few Angstrom of each other, which gave sub-Angstrom arrows
+  hidden inside their own shafts, and made the glyph size change with the
+  arrangement for no visible reason.
+* New `core.common_child_axis` and `core.force_axis_warning`.
+
 ## 1.3
 
 * **Child anchors are now box centres too** — every offset runs from the

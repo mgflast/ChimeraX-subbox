@@ -116,6 +116,13 @@ class SubboxTool(ToolInstance):
 
         # Force-zero options
         force_box = QGroupBox("Zero offset component (parent frame)")
+        force_box.setToolTip(
+            "Drops the X / Y / Z part of each child's offset, measured in the "
+            "parent map's box frame. It is meant for filaments and rings, "
+            "where only the along-axis offset is real \u2014 which assumes the "
+            "parent map's axis runs along the axis you keep. Preview checks "
+            "the children's shared rotation axis against that and warns in "
+            "the log if it does not hold.")
         fl = QHBoxLayout()
         self.fx = QCheckBox("X"); self.fx.setChecked(True)
         self.fy = QCheckBox("Y"); self.fy.setChecked(True)
@@ -218,7 +225,7 @@ class SubboxTool(ToolInstance):
             return
 
         force = (self.fx.isChecked(), self.fy.isChecked(), self.fz.isChecked())
-        _, details = core.compute_transforms(parent, child_vols, force)
+        transforms, details = core.compute_transforms(parent, child_vols, force)
         lines = ["Preview of {} child transform(s):".format(len(details))]
         warned = 0
         for cid, rel_pos, euler, dropped in details:
@@ -233,6 +240,9 @@ class SubboxTool(ToolInstance):
                     cid, rel_pos[0], rel_pos[1], rel_pos[2],
                     euler[0], euler[1], euler[2], note))
         self.session.logger.info("\n".join(lines))
+        axis_msg = core.force_axis_warning(transforms, force)
+        if axis_msg:
+            self.session.logger.warning(axis_msg)
         if warned:
             self.session.logger.warning(
                 "Subbox: force-zeroing removed most of the offset for {} "

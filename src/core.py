@@ -173,6 +173,80 @@ def compute_transforms(parent, children, force=(True, True, False)):
     return transforms, details
 
 
+_AXIS_NAMES = ('X', 'Y', 'Z')
+
+
+def common_child_axis(transforms, tol_deg=5.0):
+    """The rotation axis the child maps share, in the parent's frame.
+
+    Ring and filament arrangements -- the case the force-zeroing exists for --
+    are copies of one subunit stepped about a single axis.  Returns a unit
+    vector, or None when fewer than two children carry a real rotation or their
+    axes disagree by more than `tol_deg`.
+    """
+    rots = [np.asarray(r, float) for _, r in transforms]
+    axes = []
+    for i in range(len(rots)):
+        for j in range(i + 1, len(rots)):
+            m = rots[i].T @ rots[j]
+            angle = np.degrees(np.arccos(
+                np.clip((np.trace(m) - 1.0) / 2.0, -1.0, 1.0)))
+            if angle < 1.0 or angle > 179.0:
+                continue          # no rotation, or the axis is ill-conditioned
+            w = np.array([m[2, 1] - m[1, 2],
+                          m[0, 2] - m[2, 0],
+                          m[1, 0] - m[0, 1]], float)
+            n = np.linalg.norm(w)
+            if n > 1e-9:
+                axes.append(w / n)
+    if not axes:
+        return None
+    # A rotation by -theta about -a is the same as +theta about a; fold signs
+    # onto the first axis before averaging.
+    ref = axes[0]
+    axes = [a if np.dot(a, ref) >= 0.0 else -a for a in axes]
+    mean = np.mean(axes, axis=0)
+    n = np.linalg.norm(mean)
+    if n < 1e-9:
+        return None
+    mean /= n
+    spread = max(np.degrees(np.arccos(np.clip(np.dot(a, mean), -1.0, 1.0)))
+                 for a in axes)
+    return None if spread > tol_deg else mean
+
+
+def force_axis_warning(transforms, force):
+    """Warn when the axes kept by `force` do not contain the children's shared
+    rotation axis.
+
+    Zeroing X and Y keeps only the parent box's Z, which is right only if the
+    filament / ring axis runs along Z.  When it does not, the surviving offset
+    is the projection onto the wrong direction rather than the along-axis
+    component.  Returns a message, or None.
+    """
+    if not any(force):
+        return None
+    axis = common_child_axis(transforms)
+    if axis is None:
+        return None
+    keep = [i for i in range(3) if not force[i]]
+    if not keep:
+        return None
+    kept_name = "".join(_AXIS_NAMES[i] for i in keep)
+    frac = float(np.linalg.norm([axis[i] for i in keep]))
+    off = float(np.degrees(np.arccos(np.clip(frac, 0.0, 1.0))))
+    if off <= 5.0:
+        return None
+    return ("Subbox: the child maps are stepped about a common axis "
+            "({:.3f}, {:.3f}, {:.3f}) in the parent's frame, {:.1f} degrees "
+            "away from the axis you are keeping ({}). Zeroing assumes the "
+            "parent map's filament/ring axis runs along the kept axis; here "
+            "it does not, so what survives is a projection onto the wrong "
+            "direction, not the along-axis offset. Either turn the zeroing "
+            "off, or use a parent reference whose axis runs along {}.".format(
+                axis[0], axis[1], axis[2], off, kept_name, kept_name))
+
+
 def make_preview_bild(parent, children, force=(True, True, False)):
     """Return a BILD graphics description of the child transforms.
 
@@ -191,12 +265,14 @@ def make_preview_bild(parent, children, force=(True, True, False)):
         rots.append(p_rot @ child_rot)
     pts = np.array(pts)
 
-    if len(pts) > 1:
-        diag = float(np.linalg.norm(pts.max(axis=0) - pts.min(axis=0)))
-    else:
-        diag = 0.0
-    alen = diag * 0.12 if diag > 0 else 20.0
-    rad = max(alen * 0.06, 1.0)
+    # Scale the glyphs from the child map's own box, not from how far apart the
+    # children happen to be.  Rotational copies of one subunit can sit within a
+    # few Angstrom of each other, which gave sub-Angstrom arrows buried inside
+    # their own shafts, and made the size change with the arrangement.
+    sides = [min(n * s for n, s in zip(c.data.size, c.data.step))
+             for c in children]
+    alen = 0.3 * float(np.mean(sides)) if sides else 20.0
+    rad = alen * 0.05
 
     axis_colors = [(1.0, 0.25, 0.25), (0.35, 0.85, 0.35), (0.3, 0.45, 1.0)]
     out = [".comment subbox preview",
@@ -483,6 +559,10 @@ def run_subbox(session, star_in, star_out, parent, children,
                 "like a microtubule; if this sub-particle should sit on its "
                 "subunit, disable forceX/forceY/forceZ.".format(
                     dropped, cid, kept))
+
+    axis_msg = force_axis_warning(transforms, force)
+    if axis_msg:
+        log.warning(axis_msg)
 
     blocks = read_star(star_in)
     pblock, coord_cols, angle_cols = find_particle_block(blocks)

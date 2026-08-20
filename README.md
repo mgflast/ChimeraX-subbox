@@ -25,11 +25,11 @@ symmetry!</em></p>
 ## Install
 
 Download
-[ChimeraX_Subbox-1.3-py3-none-any.whl](https://github.com/mgflast/ChimeraX-subbox/raw/main/dist/ChimeraX_Subbox-1.3-py3-none-any.whl)
+[ChimeraX_Subbox-1.4-py3-none-any.whl](https://github.com/mgflast/ChimeraX-subbox/raw/main/dist/ChimeraX_Subbox-1.4-py3-none-any.whl)
 and, in ChimeraX:
 
 ```
-toolshed install /path/to/ChimeraX_Subbox-1.3-py3-none-any.whl
+toolshed install /path/to/ChimeraX_Subbox-1.4-py3-none-any.whl
 ```
 
 Then open it via `Tools ▸ Volume Data ▸ Subbox Particles`.
